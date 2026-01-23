@@ -1,0 +1,8 @@
+<h2>Login</h2>
+
+<button (click)="login()" [disabled]="loading">
+  {{ loading ? 'Entrando...' : 'Entrar' }}
+</button>
+
+<p *ngIf="error" style="color:red">{{ error }}</p>
+

@@ -1,0 +1,12 @@
+<h2>Home</h2>
+
+<textarea [(ngModel)]="text" rows="6" cols="60"></textarea>
+<br />
+<button (click)="summarize()" [disabled]="loading">
+  {{ loading ? 'Resumiendo...' : 'Resumir' }}
+</button>
+
+<p *ngIf="error" style="color:red">{{ error }}</p>
+
+<h3>AI</h3>
+<textarea rows="6" cols="60" readonly>{{ summary }}</textarea>
