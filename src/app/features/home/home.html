@@ -2,9 +2,14 @@
 
 <textarea [(ngModel)]="text" rows="6" cols="60"></textarea>
 <br />
-<button (click)="summarize()" [disabled]="loading">
-  {{ loading ? 'Resumiendo...' : 'Resumir' }}
+<!-- <button (click)="summarize()" [disabled]="loading">
+  {{ loading ? 'Consultando...' : 'Consultar' }}
+</button> -->
+
+<button (click)="summarizeWebhook()" [disabled]="loading">
+  Enviar
 </button>
+
 
 <p *ngIf="error" style="color:red">{{ error }}</p>
 
