@@ -1,17 +1,39 @@
-<h2>Home</h2>
+<div class="home-container">
+  <div class="chat-card">
 
-<textarea [(ngModel)]="text" rows="6" cols="60"></textarea>
-<br />
-<!-- <button (click)="summarize()" [disabled]="loading">
-  {{ loading ? 'Consultando...' : 'Consultar' }}
-</button> -->
+    <div class="chat-header">
+      <h2>Agente Inmobiliario IA</h2>
+      <span>Asistente inteligente inmobiliario</span>
+    </div>
 
-<button (click)="summarizeWebhook()" [disabled]="loading">
-  Enviar
-</button>
+    <div class="chat-messages">
+      <div *ngFor="let msg of messages"
+           [ngClass]="msg.role">
 
+        <div class="bubble">
+          {{ msg.content }}
+        </div>
 
-<p *ngIf="error" style="color:red">{{ error }}</p>
+      </div>
 
-<h3>AI</h3>
-<textarea rows="6" cols="60" readonly>{{ summary }}</textarea>
+      <div *ngIf="loading" class="ai">
+        <div class="bubble typing">Escribiendo...</div>
+      </div>
+    </div>
+
+    <form class="chat-input" (ngSubmit)="sendMessage()">
+      <textarea
+        [(ngModel)]="text"
+        name="text"
+        rows="2"
+        placeholder="Escribí tu consulta..."
+        required>
+      </textarea>
+
+      <button type="submit" [disabled]="loading">
+        Enviar
+      </button>
+    </form>
+
+  </div>
+</div>

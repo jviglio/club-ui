@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AiService } from '../../core/ai/ai.service';
 import { FormsModule } from '@angular/forms';
 import { ChangeDetectorRef } from '@angular/core';
 import { EcommerceWebhookService } from '../../core/webhooks/ecommerce-webhook.service';
@@ -10,74 +9,73 @@ import { EcommerceWebhookService } from '../../core/webhooks/ecommerce-webhook.s
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './home.html',
+  styleUrls: ['./home.scss']
 })
 export class HomeComponent {
-  text = 'Hace una consulta aqui...';
-  summary = '';
+
+  text = '';
   loading = false;
-  error = '';
 
-  constructor(private ai: AiService, private webhook: EcommerceWebhookService, private cdr: ChangeDetectorRef) {}
+  messages: { role: 'user' | 'ai', content: string }[] = [];
 
-  summarizeWebhook(): void {
-  this.loading = true;
-  this.error = '';
-  this.summary = '';
+  constructor(
+    private webhook: EcommerceWebhookService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
-  const payload = {
-    message: this.text,
-    timestamp: new Date().toISOString(),
-    messageId: `msg_${Date.now()}`,
-    metadata: {
-      website: 'JP Tech - Desarrollo de IA',
-      source: 'Home Chat',
-      pageUrl: window.location.href,
-      sessionId: 'session_home',
-      messageCount: 1
-    }
-  };
+  sendMessage(): void {
 
-  this.webhook.send(payload).subscribe({
-    next: (res) => {
-      this.loading = false;
+    if (!this.text.trim()) return;
 
-      const reply = (res as any).reply;
+    const userText = this.text;
 
-      try {
-        const parsed = JSON.parse(reply);
-        this.summary = parsed.output ?? reply;
-      } catch {
-        this.summary = reply;
+    this.messages.push({ role: 'user', content: userText });
+    this.text = '';
+    this.loading = true;
+
+    const payload = {
+      message: userText,
+      timestamp: new Date().toISOString(),
+      messageId: `msg_${Date.now()}`,
+      metadata: {
+        website: 'JP Tech - Desarrollo de IA',
+        source: 'Home Chat',
+        pageUrl: window.location.href,
+        sessionId: 'session_home',
+        messageCount: this.messages.length
       }
+    };
 
-      this.cdr.detectChanges();
-    },
-    error: (e) => {
-      this.loading = false;
-      this.error = e?.error ?? 'Falló la llamada al webhook';
-      this.cdr.detectChanges();
-    }
-  });
-}
+    this.webhook.send(payload).subscribe({
+      next: (res: any) => {
 
+        this.loading = false;
 
-  // summarize(): void {
-  //   this.loading = true;
-  //   this.error = '';
-  //   this.summary = '';
+        const reply = res?.reply ?? 'Sin respuesta del servidor';
 
-  //   this.ai.summarize(this.text).subscribe({
-  //     next: (res) => {
-  //       this.loading = false;
-  //       this.summary = res.summary;
-  //       console.log(this.summary);
-  //       this.cdr.detectChanges();        
-  //     },
-  //     error: (e) => {
-  //       this.loading = false;
-  //       this.error = e?.error ?? 'Falló la llamada';
-  //       this.cdr.detectChanges();
-  //     }
-  //   });
-  // }
+        try {
+          const parsed = JSON.parse(reply);
+          this.messages.push({
+            role: 'ai',
+            content: parsed.output ?? reply
+          });
+        } catch {
+          this.messages.push({
+            role: 'ai',
+            content: reply
+          });
+        }
+
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.loading = false;
+        this.messages.push({
+          role: 'ai',
+          content: 'Error en la consulta.'
+        });
+        this.cdr.detectChanges();
+      }
+    });
+  }
 }

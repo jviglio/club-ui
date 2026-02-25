@@ -1,8 +1,29 @@
-<h2>Login</h2>
+<div class="login-container">
+  <div class="login-card">
+    <h2>Agente Inmobiliario IA</h2>
 
-<button (click)="login()" [disabled]="loading">
-  {{ loading ? 'Entrando...' : 'Entrar' }}
-</button>
+    <form (ngSubmit)="login()">
+      <input 
+        type="text"
+        placeholder="Usuario"
+        [(ngModel)]="username"
+        name="username"
+        required
+      />
 
-<p *ngIf="error" style="color:red">{{ error }}</p>
+      <input 
+        type="password"
+        placeholder="Contraseña"
+        [(ngModel)]="password"
+        name="password"
+        required
+      />
 
+      <button type="submit" [disabled]="loading">
+        {{ loading ? 'Ingresando...' : 'Ingresar' }}
+      </button>
+    </form>
+
+    <p *ngIf="error" class="error">{{ error }}</p>
+  </div>
+</div>
