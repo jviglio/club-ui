@@ -11,7 +11,7 @@
            [ngClass]="msg.role">
 
         <div class="bubble">
-          {{ msg.content }}
+          <div [innerHTML]="msg.content"></div>
         </div>
 
       </div>

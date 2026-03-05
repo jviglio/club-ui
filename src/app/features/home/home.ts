@@ -51,20 +51,25 @@ export class HomeComponent {
 
         this.loading = false;
 
-        const reply = res?.reply ?? 'Sin respuesta del servidor';
+        let reply = res?.reply ?? 'Sin respuesta del servidor';
 
         try {
           const parsed = JSON.parse(reply);
-          this.messages.push({
-            role: 'ai',
-            content: parsed.output ?? reply
-          });
+          reply = parsed.output ?? reply;
         } catch {
-          this.messages.push({
-            role: 'ai',
-            content: reply
-          });
+          // no era JSON, lo dejamos como está
         }
+
+        // Convertir markdown de imagen a <img>
+        let formatted = reply.replace(
+          /!\[Foto\]\((.*?)\)/g,
+          `<img src="$1" style="width:100%;max-width:320px;border-radius:8px;margin-top:8px">`
+        );
+
+        this.messages.push({
+          role: 'ai',
+          content: formatted
+        });
 
         this.cdr.detectChanges();
       },
