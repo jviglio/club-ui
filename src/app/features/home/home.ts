@@ -63,7 +63,7 @@ export class HomeComponent {
         // Convertir markdown de imagen a <img>
         let formatted = reply.replace(
           /!\[Foto\]\((.*?)\)/g,
-          `<img src="$1" style="width:100%;max-width:320px;border-radius:8px;margin-top:8px">`
+          `<img src="$1" style="width:100%;max-width:100%;height:auto;display:block;">`
         );
 
         this.messages.push({
