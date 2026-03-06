@@ -80,6 +80,7 @@ export class HomeComponent implements OnInit {
           /!\[.*?\]\((.*?)\)/g,
           `<img src="$1" style="width:100%;max-width:100%;height:auto;display:block;">`
         );
+        formatted = this.addIconsToPropertyFields(formatted);
 
         this.messages.push({
           role: 'ai',
@@ -108,5 +109,31 @@ export class HomeComponent implements OnInit {
         container.scrollTop = container.scrollHeight;
       }
     });
+  }
+
+  private addIconsToPropertyFields(content: string): string {
+    const iconByField: { pattern: RegExp; icon: string }[] = [
+      { pattern: /(\n|^)(\s*[-•]?\s*)(Barrio)\s*:/gi, icon: '🏘️' },
+      { pattern: /(\n|^)(\s*[-•]?\s*)(Direcci[oó]n)\s*:/gi, icon: '📍' },
+      { pattern: /(\n|^)(\s*[-•]?\s*)(Precio)\s*:/gi, icon: '💵' },
+      { pattern: /(\n|^)(\s*[-•]?\s*)(Metros cuadrados|Superficie)\s*:/gi, icon: '📐' },
+      { pattern: /(\n|^)(\s*[-•]?\s*)(Ambientes)\s*:/gi, icon: '🛋️' },
+      { pattern: /(\n|^)(\s*[-•]?\s*)(Cochera)\s*:/gi, icon: '🚗' },
+      { pattern: /(\n|^)(\s*[-•]?\s*)(Pisos)\s*:/gi, icon: '🏢' },
+      { pattern: /(\n|^)(\s*[-•]?\s*)(Parque|Jard[ií]n)\s*:/gi, icon: '🌳' },
+      { pattern: /(\n|^)(\s*[-•]?\s*)(Tipo)\s*:/gi, icon: '🏠' },
+      { pattern: /(\n|^)(\s*[-•]?\s*)(Foto)\s*:/gi, icon: '🖼️' }
+    ];
+
+    let enriched = content;
+
+    for (const entry of iconByField) {
+      enriched = enriched.replace(
+        entry.pattern,
+        `$1$2<span class="chat-field-label"><span class="chat-field-icon">${entry.icon}</span>$3:</span>`
+      );
+    }
+
+    return enriched;
   }
 }

@@ -195,6 +195,19 @@
   border-bottom-left-radius: 4px;
 }
 
+.ai .bubble .chat-field-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+  font-weight: 700;
+  color: #2b221d;
+}
+
+.ai .bubble .chat-field-icon {
+  font-size: 0.95em;
+  line-height: 1;
+}
+
 .typing {
   opacity: 0.8;
   font-style: italic;
