@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ChangeDetectorRef } from '@angular/core';
@@ -14,6 +14,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./home.scss']
 })
 export class HomeComponent implements OnInit {
+  @ViewChild('chatMessages') chatMessages?: ElementRef<HTMLDivElement>;
 
   text = '';
   loading = false;
@@ -45,6 +46,7 @@ export class HomeComponent implements OnInit {
     this.messages.push({ role: 'user', content: userText });
     this.text = '';
     this.loading = true;
+    this.scrollToBottom();
 
     const payload = {
       message: userText,
@@ -85,6 +87,7 @@ export class HomeComponent implements OnInit {
         });
 
         this.cdr.detectChanges();
+        this.scrollToBottom();
       },
       error: () => {
         this.loading = false;
@@ -93,6 +96,16 @@ export class HomeComponent implements OnInit {
           content: 'Error en la consulta.'
         });
         this.cdr.detectChanges();
+        this.scrollToBottom();
+      }
+    });
+  }
+
+  private scrollToBottom(): void {
+    requestAnimationFrame(() => {
+      const container = this.chatMessages?.nativeElement;
+      if (container) {
+        container.scrollTop = container.scrollHeight;
       }
     });
   }
