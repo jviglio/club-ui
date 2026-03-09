@@ -78,8 +78,9 @@ export class HomeComponent implements OnInit {
         // Convertir markdown de imagen a <img>
         let formatted = reply.replace(
           /!\[.*?\]\((.*?)\)/g,
-          `<img src="$1" style="width:100%;max-width:100%;height:auto;display:block;">`
+          `<img src="$1" alt="Foto de propiedad">`
         );
+        formatted = this.normalizeChatImages(formatted);
         formatted = this.addIconsToPropertyFields(formatted);
 
         this.messages.push({
@@ -135,5 +136,48 @@ export class HomeComponent implements OnInit {
     }
 
     return enriched;
+  }
+
+  private normalizeChatImages(content: string): string {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(`<div>${content}</div>`, 'text/html');
+    const root = doc.body.firstElementChild as HTMLElement | null;
+
+    if (!root) {
+      return content;
+    }
+
+    root.querySelectorAll<HTMLElement>('*').forEach((element) => {
+      element.removeAttribute('width');
+      element.removeAttribute('height');
+
+      if (element.tagName !== 'IMG') {
+        element.style.removeProperty('width');
+        element.style.removeProperty('max-width');
+        element.style.removeProperty('min-width');
+        element.style.removeProperty('height');
+        element.style.removeProperty('max-height');
+      }
+    });
+
+    root.querySelectorAll('img').forEach((image) => {
+      const src = image.getAttribute('src');
+      if (!src) {
+        return;
+      }
+
+      const wrapper = doc.createElement('div');
+      wrapper.className = 'chat-image-wrap';
+
+      const normalizedImage = doc.createElement('img');
+      normalizedImage.className = 'chat-image';
+      normalizedImage.src = src;
+      normalizedImage.alt = image.getAttribute('alt') || 'Foto de propiedad';
+
+      wrapper.appendChild(normalizedImage);
+      image.replaceWith(wrapper);
+    });
+
+    return root.innerHTML;
   }
 }
