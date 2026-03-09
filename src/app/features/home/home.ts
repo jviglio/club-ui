@@ -90,6 +90,7 @@ export class HomeComponent implements OnInit {
 
         this.cdr.detectChanges();
         this.scrollToBottom();
+        this.bindChatImageLoadScroll();
       },
       error: () => {
         this.loading = false;
@@ -110,6 +111,10 @@ export class HomeComponent implements OnInit {
         container.scrollTop = container.scrollHeight;
       }
     });
+  }
+
+  trackByMessage(index: number): number {
+    return index;
   }
 
   private addIconsToPropertyFields(content: string): string {
@@ -179,5 +184,28 @@ export class HomeComponent implements OnInit {
     });
 
     return root.innerHTML;
+  }
+
+  private bindChatImageLoadScroll(): void {
+    const container = this.chatMessages?.nativeElement;
+
+    if (!container) {
+      return;
+    }
+
+    container.querySelectorAll<HTMLImageElement>('.chat-image').forEach((image) => {
+      if (image.dataset['scrollBound'] === 'true') {
+        return;
+      }
+
+      image.dataset['scrollBound'] = 'true';
+
+      if (image.complete) {
+        this.scrollToBottom();
+        return;
+      }
+
+      image.addEventListener('load', () => this.scrollToBottom(), { once: true });
+    });
   }
 }

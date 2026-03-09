@@ -22,7 +22,7 @@
     </div>
 
     <div class="chat-messages" #chatMessages>
-      <div *ngFor="let msg of messages"
+      <div *ngFor="let msg of messages; trackBy: trackByMessage"
            [ngClass]="msg.role">
 
         <div class="bubble">
@@ -41,6 +41,7 @@
         [(ngModel)]="text"
         name="text"
         rows="2"
+        aria-label="Escribi tu consulta"
         placeholder="Escribi tu consulta..."
         required>
       </textarea>
